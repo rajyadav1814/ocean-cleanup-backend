@@ -1,0 +1,62 @@
+[
+  {
+    "id": "activity-1784627012299-581",
+    "category": "plastic",
+    "location": "Rajkot",
+    "quantity": 1,
+    "evidenceHash": "mock-hash",
+    "contributorId": "contrib-1",
+    "organizationId": "org-1",
+    "notes": "",
+    "timestamp": "2026-07-21T09:43:32.290Z",
+    "status": "pending"
+  },
+  {
+    "id": "activity-1784627071357-422",
+    "category": "plastic",
+    "location": "Goa",
+    "quantity": 10,
+    "evidenceHash": "mock-hash",
+    "contributorId": "contrib-1",
+    "organizationId": "org-1",
+    "notes": "",
+    "timestamp": "2026-07-21T09:44:31.354Z",
+    "status": "pending"
+  },
+  {
+    "id": "activity-1784627838058-508",
+    "category": "nets",
+    "location": "Div",
+    "quantity": 100,
+    "evidenceHash": "mock-hash",
+    "contributorId": "contrib-1",
+    "organizationId": "org-1",
+    "notes": "",
+    "timestamp": "2026-07-21T09:57:18.055Z",
+    "status": "pending"
+  },
+  {
+    "id": "activity-1784697797764-173",
+    "category": "plastic",
+    "location": "baga beach",
+    "quantity": "120",
+    "evidenceHash": "mock-hash",
+    "contributorId": "contrib-1",
+    "organizationId": "org-1",
+    "notes": "",
+    "timestamp": "2026-07-22T05:23:17.761Z",
+    "status": "pending"
+  },
+  {
+    "id": "activity-1784698073377-463",
+    "category": "plastic",
+    "location": "demo",
+    "quantity": "140",
+    "evidenceHash": "hash-Screenshot from 2026-06-06 15-26-21.png-1784698058881",
+    "contributorId": "contrib-1",
+    "organizationId": "org-1",
+    "notes": "",
+    "timestamp": "2026-07-22T05:27:53.374Z",
+    "status": "pending"
+  }
+]
