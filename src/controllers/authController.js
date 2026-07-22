@@ -5,9 +5,9 @@ import { findUserByUsername, createUser, findUserById } from '../services/userSe
 
 async function signup(req, res) {
   try {
-    const { username, password, role } = req.body;
-    if (!username || !password || !role) {
-      return res.status(400).json({ ok: false, message: 'Username, password, and role are required' });
+    const { firstName, lastName, email, username, password, role } = req.body;
+    if (!firstName || !lastName || !email || !username || !password || !role) {
+      return res.status(400).json({ ok: false, message: 'All fields are required' });
     }
 
     const validRoles = ['admin', 'contributor', 'verifier'];
@@ -21,10 +21,10 @@ async function signup(req, res) {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await createUser({ username, password: hashedPassword, role });
+    const user = await createUser({ firstName, lastName, email, username, password: hashedPassword, role });
 
     const token = jwt.sign({ id: user.id, role: user.role }, env.jwtSecret, { expiresIn: '24h' });
-    res.json({ ok: true, token, user: { id: user.id, username: user.username, role: user.role } });
+    res.json({ ok: true, token, user: { id: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email, username: user.username, role: user.role } });
   } catch (error) {
     console.error('Signup error:', error);
     res.status(500).json({ ok: false, message: 'Internal server error' });
@@ -49,7 +49,7 @@ async function login(req, res) {
     }
 
     const token = jwt.sign({ id: user.id, role: user.role }, env.jwtSecret, { expiresIn: '24h' });
-    res.json({ ok: true, token, user: { id: user.id, username: user.username, role: user.role } });
+    res.json({ ok: true, token, user: { id: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email, username: user.username, role: user.role } });
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ ok: false, message: 'Internal server error' });
@@ -71,7 +71,7 @@ async function verify(req, res) {
       return res.status(401).json({ ok: false, message: 'User not found' });
     }
 
-    res.json({ ok: true, user: { id: user.id, username: user.username, role: user.role } });
+    res.json({ ok: true, user: { id: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email, username: user.username, role: user.role } });
   } catch (error) {
     console.error('Verify error:', error);
     res.status(401).json({ ok: false, message: 'Invalid token' });
