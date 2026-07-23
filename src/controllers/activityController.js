@@ -6,6 +6,7 @@ import ipfsService from '../services/ipfsService.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const DATA_FILE = path.join(__dirname, '../../data/activities.json');
+const ALLOWED_STATUSES = new Set(['pending', 'rejected', 'approved']);
 const STATUS_ORDER = {
   pending: 0,
   rejected: 1,
@@ -14,6 +15,14 @@ const STATUS_ORDER = {
 
 function normalizeStatus(value) {
   return String(value || '').trim().toLowerCase();
+}
+
+function normalizeStatusFilter(value) {
+  const normalized = normalizeStatus(value);
+  if (!ALLOWED_STATUSES.has(normalized)) {
+    return null;
+  }
+  return normalized;
 }
 
 function getActivityTimestamp(activity) {
@@ -51,7 +60,7 @@ async function writeData(data) {
 async function list(req, res) {
   try {
     const activities = await readData();
-    const statusFilter = normalizeStatus(req.query.status);
+    const statusFilter = normalizeStatusFilter(req.query.status);
 
     const filteredActivities = statusFilter
       ? activities.filter((activity) => normalizeStatus(activity.status) === statusFilter)

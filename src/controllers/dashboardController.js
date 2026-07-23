@@ -6,6 +6,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const DATA_FILE = path.join(__dirname, '../../data/activities.json');
 
+function normalizeStatus(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
 async function getStats(req, res) {
   try {
     let activities = [];
@@ -17,13 +21,13 @@ async function getStats(req, res) {
     }
 
     const totalActivities = activities.length;
-    const approvedActivities = activities.filter((a) => a.status === 'approved').length;
-    const pendingActivities = activities.filter((a) => a.status === 'pending').length;
-    const rejectedActivities = activities.filter((a) => a.status === 'rejected').length;
+    const approvedActivities = activities.filter((a) => normalizeStatus(a.status) === 'approved').length;
+    const pendingActivities = activities.filter((a) => normalizeStatus(a.status) === 'pending').length;
+    const rejectedActivities = activities.filter((a) => normalizeStatus(a.status) === 'rejected').length;
 
     const totalKgCollected = activities.reduce((sum, a) => sum + (Number.parseFloat(a.quantity) || 0), 0);
     const approvedKgCollected = activities
-      .filter((a) => a.status === 'approved')
+      .filter((a) => normalizeStatus(a.status) === 'approved')
       .reduce((sum, a) => sum + (Number.parseFloat(a.quantity) || 0), 0);
 
     const totalVolunteers = activities.reduce((sum, a) => sum + (Number.parseInt(a.volunteers, 10) || 0), 0);

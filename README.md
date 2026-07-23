@@ -11,7 +11,7 @@ This is the Express.js backend API for the Ocean Cleanup tracking platform. It h
 ## API Endpoints
 
 - `GET /api/health` - Health check
-- `GET /api/activities` - List all activities
+- `GET /api/activities` - List all activities (`?status=pending|approved|rejected` filters the list)
 - `POST /api/activities` - Submit a new activity (requires category, location, quantity, evidenceHash, etc.)
 - `GET /api/activities/:id` - Get specific activity details
 - `POST /api/activities/:id/review` - Review an activity (approve/reject)
