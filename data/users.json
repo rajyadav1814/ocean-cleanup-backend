@@ -12,5 +12,15 @@
     "password": "$2b$10$hoS.TBk..QEQQnI4u0T3UO4CyZV52zdJ.s7W5/gzKbR5bviYfbuoq",
     "role": "contributor",
     "createdAt": "2026-07-22T07:39:23.702Z"
+  },
+  {
+    "id": "1784791118800",
+    "firstName": "Raj",
+    "lastName": "Yadav",
+    "email": "raj@gmail.com",
+    "username": "raj1",
+    "password": "$2b$10$8YdLwd4586sdLvh2DinQXOK7ihQZB.1N5rSt4.NB3/4u1I/.RKYPy",
+    "role": "verifier",
+    "createdAt": "2026-07-23T07:18:38.800Z"
   }
 ]
