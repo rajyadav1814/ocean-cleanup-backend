@@ -105,6 +105,8 @@
     "gps": "22.3276253, 70.7685296",
     "notes": "",
     "timestamp": "2026-07-23T06:26:37.778Z",
-    "status": "pending"
+    "status": "approved",
+    "reviewNote": "",
+    "reviewedAt": "2026-07-23T07:20:07.126Z"
   }
 ]
