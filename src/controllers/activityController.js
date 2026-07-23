@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import ipfsService from '../services/ipfsService.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,13 +34,55 @@ async function list(req, res) {
   }
 }
 
-  async function create(req, res) {
+// Helper: convert a base64 data URI → { buffer, mimeType, filename }
+function parseBase64Image(dataUri) {
+  // Format: "data:<mimeType>;base64,<data>"
+  const match = dataUri.match(/^data:([^;]+);base64,(.+)$/);
+  if (!match) return null;
+  const mimeType = match[1];
+  const buffer = Buffer.from(match[2], 'base64');
+  const ext = mimeType.split('/')[1] || 'bin';
+  const filename = `upload-${Date.now()}.${ext}`;
+  return { buffer, mimeType, filename };
+}
+
+async function create(req, res) {
   try {
-    const { category, location, quantity, evidenceHash, contributorId, organizationId, imageUrl } = req.body;
-    
+    const { category, location, quantity, evidenceHash, contributorId, organizationId, imageUrl, lat, lon, gps } = req.body;
+
     // Basic validation
     if (!category || !location || !quantity) {
       return res.status(400).json({ ok: false, error: 'Missing required fields' });
+    }
+
+    // Upload image to Pinata IPFS if provided
+    let imageCid = null;
+    let imageIpfsUrl = null;
+    let imageGatewayUrl = null;
+
+    if (req.file) {
+      // Multipart form-data upload
+      console.log(`Uploading image "${req.file.originalname}" to Pinata...`);
+      const uploaded = await ipfsService.uploadFile(
+        req.file.buffer,
+        req.file.originalname,
+        req.file.mimetype
+      );
+      imageCid = uploaded.cid;
+      imageIpfsUrl = uploaded.ipfsUrl;
+      imageGatewayUrl = uploaded.gatewayUrl;
+      console.log(`Image pinned to IPFS: ${imageGatewayUrl}`);
+    } else if (imageUrl && imageUrl.startsWith('data:')) {
+      // Base64 data URI sent in JSON body
+      console.log('Uploading base64 image to Pinata...');
+      const parsed = parseBase64Image(imageUrl);
+      if (parsed) {
+        const uploaded = await ipfsService.uploadFile(parsed.buffer, parsed.filename, parsed.mimeType);
+        imageCid = uploaded.cid;
+        imageIpfsUrl = uploaded.ipfsUrl;
+        imageGatewayUrl = uploaded.gatewayUrl;
+        console.log(`Image pinned to IPFS: ${imageGatewayUrl}`);
+      }
     }
 
     const activities = await readData();
@@ -51,20 +94,28 @@ async function list(req, res) {
       evidenceHash,
       contributorId,
       organizationId,
-      imageUrl: imageUrl || null,
+      // IPFS image fields
+      imageCid: imageCid || null,
+      imageIpfsUrl: imageIpfsUrl || null,
+      imageGatewayUrl: imageGatewayUrl || null,
+      lat: lat || null,
+      lon: lon || null,
+      gps: gps || null,
       notes: req.body.notes || '',
       timestamp: req.body.timestamp || new Date().toISOString(),
       status: 'pending'
     };
-    
+
     activities.push(activity);
     await writeData(activities);
-    
+
     res.status(201).json({ ok: true, activity });
   } catch (error) {
-    res.status(500).json({ ok: false, error: 'Failed to create activity' });
+    console.error('Error creating activity:', error);
+    res.status(500).json({ ok: false, error: error.message || 'Failed to create activity' });
   }
 }
+
 
 async function getById(req, res) {
   try {

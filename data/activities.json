@@ -58,5 +58,53 @@
     "notes": "",
     "timestamp": "2026-07-22T05:27:53.374Z",
     "status": "pending"
+  },
+  {
+    "id": "activity-1784787108764-212",
+    "category": "plastic",
+    "location": "rajkot",
+    "quantity": "2",
+    "evidenceHash": "hash-sony-logo.png-1784786875711",
+    "contributorId": "contrib-1",
+    "organizationId": "org-1",
+    "imageCid": "QmXJm5e5VXyAjbXLmQHW51hdNtUS7AFkpVNBDmC3r6xxaN",
+    "imageIpfsUrl": "ipfs://QmXJm5e5VXyAjbXLmQHW51hdNtUS7AFkpVNBDmC3r6xxaN",
+    "imageGatewayUrl": "https://gateway.pinata.cloud/ipfs/QmXJm5e5VXyAjbXLmQHW51hdNtUS7AFkpVNBDmC3r6xxaN",
+    "notes": "",
+    "timestamp": "2026-07-23T06:11:44.890Z",
+    "status": "pending"
+  },
+  {
+    "id": "activity-1784787493274-104",
+    "category": "plastic",
+    "location": "madhapar rajkot",
+    "quantity": "4",
+    "evidenceHash": "hash-unnamed.gif-1784787449348",
+    "contributorId": "contrib-1",
+    "organizationId": "org-1",
+    "imageCid": "QmcDJX8bscqd2h4BjbaBD6XPYG8dqLmpdN6ahtD4uY9uSL",
+    "imageIpfsUrl": "ipfs://QmcDJX8bscqd2h4BjbaBD6XPYG8dqLmpdN6ahtD4uY9uSL",
+    "imageGatewayUrl": "https://gateway.pinata.cloud/ipfs/QmcDJX8bscqd2h4BjbaBD6XPYG8dqLmpdN6ahtD4uY9uSL",
+    "notes": "",
+    "timestamp": "2026-07-23T06:18:07.412Z",
+    "status": "pending"
+  },
+  {
+    "id": "activity-1784788001524-636",
+    "category": "plastic",
+    "location": "150 feet ring road, Rajkot Taluka, Rajkot, Gujarat, 360006, India",
+    "quantity": "2",
+    "evidenceHash": "hash-sony-music-entertainment-2023-logo-png_seeklogo-505947.png-1784787986530",
+    "contributorId": "contrib-1",
+    "organizationId": "org-1",
+    "imageCid": "QmQEqpQH7v1Ba7jyeMTx25E2yvdQrjThmrWnmw59Z8fwj7",
+    "imageIpfsUrl": "ipfs://QmQEqpQH7v1Ba7jyeMTx25E2yvdQrjThmrWnmw59Z8fwj7",
+    "imageGatewayUrl": "https://gateway.pinata.cloud/ipfs/QmQEqpQH7v1Ba7jyeMTx25E2yvdQrjThmrWnmw59Z8fwj7",
+    "lat": 22.3276253,
+    "lon": 70.7685296,
+    "gps": "22.3276253, 70.7685296",
+    "notes": "",
+    "timestamp": "2026-07-23T06:26:37.778Z",
+    "status": "pending"
   }
 ]
