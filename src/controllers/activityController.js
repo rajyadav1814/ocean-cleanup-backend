@@ -6,6 +6,29 @@ import ipfsService from '../services/ipfsService.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const DATA_FILE = path.join(__dirname, '../../data/activities.json');
+const STATUS_ORDER = {
+  pending: 0,
+  rejected: 1,
+  approved: 2
+};
+
+function normalizeStatus(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+function getActivityTimestamp(activity) {
+  const timestamp = activity?.timestamp ? new Date(activity.timestamp).getTime() : NaN;
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
+function compareActivities(a, b) {
+  const statusDiff = (STATUS_ORDER[normalizeStatus(a.status)] ?? 99) - (STATUS_ORDER[normalizeStatus(b.status)] ?? 99);
+  if (statusDiff !== 0) {
+    return statusDiff;
+  }
+
+  return getActivityTimestamp(b) - getActivityTimestamp(a);
+}
 
 async function readData() {
   try {
@@ -28,7 +51,20 @@ async function writeData(data) {
 async function list(req, res) {
   try {
     const activities = await readData();
-    res.json({ ok: true, activities });
+    const statusFilter = normalizeStatus(req.query.status);
+
+    const filteredActivities = statusFilter
+      ? activities.filter((activity) => normalizeStatus(activity.status) === statusFilter)
+      : activities;
+
+    res.json({
+      ok: true,
+      activities: [...filteredActivities].sort(compareActivities),
+      filters: {
+        status: statusFilter || null,
+        availableStatuses: ['pending', 'rejected', 'approved']
+      }
+    });
   } catch (error) {
     res.status(500).json({ ok: false, error: 'Failed to read activities' });
   }
@@ -142,7 +178,7 @@ async function review(req, res) {
     
     activities[index] = {
       ...activities[index],
-      status: req.body.status || 'approved',
+      status: normalizeStatus(req.body.status) || 'approved',
       reviewNote: req.body.reviewNote || '',
       reviewedAt: new Date().toISOString()
     };

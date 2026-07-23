@@ -37,7 +37,7 @@
     "gps": "21.6417, 69.6010",
     "notes": "Dummy cleanup activity",
     "timestamp": "2026-07-23T07:32:00.000Z",
-    "status": "approved",
+    "status": "rejected",
     "reviewNote": "",
     "reviewedAt": "2026-07-23T07:33:00.000Z"
   },
@@ -58,7 +58,7 @@
     "gps": "20.9026, 70.3642",
     "notes": "Dummy cleanup activity",
     "timestamp": "2026-07-23T07:34:00.000Z",
-    "status": "approved",
+    "status": "pending",
     "reviewNote": "",
     "reviewedAt": "2026-07-23T07:35:00.000Z"
   },
@@ -100,7 +100,7 @@
     "gps": "21.0844, 72.7095",
     "notes": "Dummy cleanup activity",
     "timestamp": "2026-07-23T07:38:00.000Z",
-    "status": "approved",
+    "status": "pending",
     "reviewNote": "",
     "reviewedAt": "2026-07-23T07:39:00.000Z"
   },
@@ -121,7 +121,7 @@
     "gps": "22.8333, 69.3500",
     "notes": "Dummy cleanup activity",
     "timestamp": "2026-07-23T07:40:00.000Z",
-    "status": "approved",
+    "status": "rejected",
     "reviewNote": "",
     "reviewedAt": "2026-07-23T07:41:00.000Z"
   },
