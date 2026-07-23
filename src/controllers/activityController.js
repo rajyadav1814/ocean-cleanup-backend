@@ -48,7 +48,7 @@ function parseBase64Image(dataUri) {
 
 async function create(req, res) {
   try {
-    const { category, location, quantity, evidenceHash, contributorId, organizationId, imageUrl, lat, lon, gps } = req.body;
+    const { category, location, quantity, evidenceHash, contributorId, organizationId, imageUrl, lat, lon, gps, volunteers, notes } = req.body;
 
     // Basic validation
     if (!category || !location || !quantity) {
@@ -91,6 +91,7 @@ async function create(req, res) {
       category,
       location,
       quantity,
+      volunteers: volunteers ? parseInt(volunteers, 10) : 0,
       evidenceHash,
       contributorId,
       organizationId,
@@ -101,7 +102,7 @@ async function create(req, res) {
       lat: lat || null,
       lon: lon || null,
       gps: gps || null,
-      notes: req.body.notes || '',
+      notes: notes || '',
       timestamp: req.body.timestamp || new Date().toISOString(),
       status: 'pending'
     };
