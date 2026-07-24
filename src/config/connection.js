@@ -7,6 +7,29 @@ function getConnectionString() {
   return process.env.DATABASE_URL || null;
 }
 
+function shouldUseSsl(connectionString) {
+  try {
+    const url = new URL(connectionString);
+    const host = url.hostname.toLowerCase();
+
+    if (url.searchParams.get('sslmode') === 'disable') {
+      return false;
+    }
+
+    if (url.searchParams.get('sslmode') === 'require') {
+      return { rejectUnauthorized: false };
+    }
+
+    if (host === 'localhost' || host === '127.0.0.1' || host === '::1') {
+      return false;
+    }
+
+    return { rejectUnauthorized: false };
+  } catch {
+    return false;
+  }
+}
+
 function getPool() {
   const connectionString = getConnectionString();
 
@@ -15,10 +38,9 @@ function getPool() {
   }
 
   if (!pool) {
-    const isProduction = process.env.NODE_ENV === 'production';
     pool = new Pool({
       connectionString,
-      ssl: isProduction ? { rejectUnauthorized: false } : false
+      ssl: shouldUseSsl(connectionString)
     });
   }
 
