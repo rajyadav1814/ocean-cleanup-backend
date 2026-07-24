@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import multer from 'multer';
 import activityController from '../controllers/activityController.js';
+import { authenticate } from '../middleware/authMiddleware.js';
 
 const router = Router();
 // Store uploaded file in memory as a Buffer (no disk writes)
@@ -11,5 +12,6 @@ router.post('/', upload.single('image'), activityController.create);
 router.get('/:id', activityController.getById);
 router.post('/:id/review', activityController.review);
 router.post('/:id/mint', activityController.mint);
+router.delete('/:id', authenticate, activityController.remove);
 
 export default router;

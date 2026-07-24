@@ -1,11 +1,6 @@
 import { query } from '../config/connection.js';
 
 const ALLOWED_STATUSES = new Set(['pending', 'rejected', 'approved']);
-const STATUS_ORDER = {
-  pending: 0,
-  rejected: 1,
-  approved: 2
-};
 
 function normalizeStatus(value) {
   return String(value || '').trim().toLowerCase();
@@ -74,6 +69,13 @@ function makeRewardId(activityId) {
   return `reward-${activityId}`;
 }
 
+function getActivitySelectColumns() {
+  return `id, category, location, quantity, volunteers, evidence_hash, contributor_id, organization_id,
+          image_cid, image_ipfs_url, image_gateway_url, lat, lon, gps, notes,
+          submitted_at, status, review_note, reviewed_at,
+          reward_id, reward_tx_hash, reward_amount, reward_token_type, reward_minted_at`;
+}
+
 export async function listActivities(statusFilter = null) {
   const normalizedStatus = normalizeStatusFilter(statusFilter);
   const params = [];
@@ -85,10 +87,7 @@ export async function listActivities(statusFilter = null) {
   }
 
   const result = await query(
-    `SELECT id, category, location, quantity, volunteers, evidence_hash, contributor_id, organization_id,
-            image_cid, image_ipfs_url, image_gateway_url, lat, lon, gps, notes,
-            submitted_at, status, review_note, reviewed_at,
-            reward_id, reward_tx_hash, reward_amount, reward_token_type, reward_minted_at
+    `SELECT ${getActivitySelectColumns()}
      FROM activities
      ${whereClause}
      ORDER BY
@@ -113,10 +112,7 @@ export async function listActivities(statusFilter = null) {
 
 export async function getActivityById(id) {
   const result = await query(
-    `SELECT id, category, location, quantity, volunteers, evidence_hash, contributor_id, organization_id,
-            image_cid, image_ipfs_url, image_gateway_url, lat, lon, gps, notes,
-            submitted_at, status, review_note, reviewed_at,
-            reward_id, reward_tx_hash, reward_amount, reward_token_type, reward_minted_at
+    `SELECT ${getActivitySelectColumns()}
      FROM activities
      WHERE id = $1
      LIMIT 1`,
@@ -138,10 +134,7 @@ export async function createActivity(payload) {
       $1, $2, $3, $4, $5, $6, $7, $8,
       $9, $10, $11, $12, $13, $14, $15, $16, 'pending'
      )
-     RETURNING id, category, location, quantity, volunteers, evidence_hash, contributor_id, organization_id,
-               image_cid, image_ipfs_url, image_gateway_url, lat, lon, gps, notes,
-               submitted_at, status, review_note, reviewed_at,
-               reward_id, reward_tx_hash, reward_amount, reward_token_type, reward_minted_at`,
+     RETURNING ${getActivitySelectColumns()}`,
     [
       activityId,
       payload.category,
@@ -173,10 +166,7 @@ export async function reviewActivity(id, status, reviewNote = '') {
          review_note = $3,
          reviewed_at = NOW()
      WHERE id = $1
-     RETURNING id, category, location, quantity, volunteers, evidence_hash, contributor_id, organization_id,
-               image_cid, image_ipfs_url, image_gateway_url, lat, lon, gps, notes,
-               submitted_at, status, review_note, reviewed_at,
-               reward_id, reward_tx_hash, reward_amount, reward_token_type, reward_minted_at`,
+     RETURNING ${getActivitySelectColumns()}`,
     [id, normalizedStatus, reviewNote || '']
   );
 
@@ -192,10 +182,7 @@ export async function mintReward(id, amount = 10, tokenType = 'OCEAN') {
          reward_token_type = $5,
          reward_minted_at = NOW()
      WHERE id = $1
-     RETURNING id, category, location, quantity, volunteers, evidence_hash, contributor_id, organization_id,
-               image_cid, image_ipfs_url, image_gateway_url, lat, lon, gps, notes,
-               submitted_at, status, review_note, reviewed_at,
-               reward_id, reward_tx_hash, reward_amount, reward_token_type, reward_minted_at`,
+     RETURNING ${getActivitySelectColumns()}`,
     [
       id,
       makeRewardId(id),
@@ -206,6 +193,17 @@ export async function mintReward(id, amount = 10, tokenType = 'OCEAN') {
   );
 
   return mapActivityRow(result.rows[0]);
+}
+
+export async function deleteActivity(id) {
+  const result = await query(
+    `DELETE FROM activities
+     WHERE id = $1
+     RETURNING id`,
+    [id]
+  );
+
+  return result.rowCount > 0;
 }
 
 export async function getDashboardStats() {

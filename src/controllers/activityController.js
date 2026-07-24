@@ -4,7 +4,8 @@ import {
   createActivity,
   getActivityById,
   reviewActivity,
-  mintReward
+  mintReward,
+  deleteActivity
 } from '../services/activityService.js';
 
 // Helper: convert a base64 data URI → { buffer, mimeType, filename }
@@ -140,4 +141,18 @@ async function mint(req, res) {
   }
 }
 
-export default { list, create, getById, review, mint };
+async function remove(req, res) {
+  try {
+    const deleted = await deleteActivity(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ ok: false, error: 'Activity not found' });
+    }
+
+    res.json({ ok: true, message: 'Activity deleted successfully' });
+  } catch (error) {
+    console.error('Delete activity error:', error);
+    res.status(500).json({ ok: false, error: 'Failed to delete activity' });
+  }
+}
+
+export default { list, create, getById, review, mint, remove };
