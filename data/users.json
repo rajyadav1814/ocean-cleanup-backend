@@ -1,6 +1,9 @@
 [
   {
     "id": "1784705777026",
+    "firstName": "Raj",
+    "lastName": "Yadav",
+    "email": "raj@gmail.com",
     "username": "admin",
     "password": "$2b$10$hoS.TBk..QEQQnI4u0T3UO4CyZV52zdJ.s7W5/gzKbR5bviYfbuoq",
     "role": "admin",
@@ -8,6 +11,9 @@
   },
   {
     "id": "1784705963702",
+    "firstName": "Raj",
+    "lastName": "Yadav",
+    "email": "raj@gmail.com",
     "username": "raj",
     "password": "$2b$10$hoS.TBk..QEQQnI4u0T3UO4CyZV52zdJ.s7W5/gzKbR5bviYfbuoq",
     "role": "contributor",
