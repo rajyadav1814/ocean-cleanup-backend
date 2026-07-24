@@ -1,40 +1,53 @@
 # Ocean Cleanup Backend
 
-This is the Express.js backend API for the Ocean Cleanup tracking platform. It handles the core business logic, activity submissions, reviews, and data persistence.
+Express.js backend API for the Ocean Cleanup tracking platform.
 
 ## Features
 
-- **Activity Tracking API**: Endpoints to create, read, review, and mint rewards for cleanup activities.
-- **File System Persistence**: Lightweight local JSON data store (`data/activities.json`) for easy development and testing.
-- **Upload Mocking**: Basic endpoints to handle file uploads and evidence verification.
+- PostgreSQL-backed authentication, activity tracking, and dashboard stats
+- Activity submission, review, and reward minting APIs
+- File uploads and IPFS upload support
+- Modular routes, controllers, and services
 
 ## API Endpoints
 
 - `GET /api/health` - Health check
-- `GET /api/activities` - List all activities (`?status=pending|approved|rejected` filters the list)
-- `POST /api/activities` - Submit a new activity (requires category, location, quantity, evidenceHash, etc.)
-- `GET /api/activities/:id` - Get specific activity details
-- `POST /api/activities/:id/review` - Review an activity (approve/reject)
+- `GET /api/activities` - List activities (`?status=pending|approved|rejected`)
+- `POST /api/activities` - Submit a new activity
+- `GET /api/activities/:id` - Get activity details
+- `POST /api/activities/:id/review` - Review an activity
 - `POST /api/activities/:id/mint` - Mint reward tokens for an activity
+- `GET /api/dashboard/stats` - Dashboard statistics
 - `POST /api/uploads` - Handle file uploads
+- `POST /api/auth/signup` - Register a user
+- `POST /api/auth/login` - Login
+- `GET /api/auth/verify` - Verify JWT
+
+## Environment Variables
+
+Create a `.env` file with at least:
+
+```env
+PORT=3000
+HOST=localhost
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ocean_db
+JWT_SECRET=your_secret_here
+```
+
+## Database
+
+Run the PostgreSQL schema in `db/schema.sql` before starting the server.
 
 ## Getting Started
 
 1. Install dependencies:
-   ```bash
-   npm install
-   ```
+
+```bash
+npm install
+```
 
 2. Start the server:
-   ```bash
-   npm start
-   ```
 
-The server will automatically find an available port and start listening. Check the console output for the specific URL.
-
-## Architecture
-
-- Uses standard Express middleware (`cors`, `express.json`)
-- Modular routing in `src/routes/`
-- Request handling logic in `src/controllers/`
-- Data stored locally in the `data/` directory
+```bash
+npm start
+```

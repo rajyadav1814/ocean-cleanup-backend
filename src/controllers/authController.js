@@ -1,11 +1,25 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { env } from '../config/env.js';
-import { findUserByUsername, createUser, findUserById } from '../services/userService.js';
+import { findUserByUsername, findUserByEmail, createUser, findUserById } from '../services/userService.js';
+
+function normalizeUsername(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+function normalizeEmail(value) {
+  return String(value || '').trim().toLowerCase();
+}
 
 async function signup(req, res) {
   try {
-    const { firstName, lastName, email, username, password, role } = req.body;
+    const firstName = String(req.body.firstName || '').trim();
+    const lastName = String(req.body.lastName || '').trim();
+    const email = normalizeEmail(req.body.email);
+    const username = normalizeUsername(req.body.username);
+    const password = String(req.body.password || '');
+    const role = String(req.body.role || '').trim();
+
     if (!firstName || !lastName || !email || !username || !password || !role) {
       return res.status(400).json({ ok: false, message: 'All fields are required' });
     }
@@ -15,9 +29,17 @@ async function signup(req, res) {
       return res.status(400).json({ ok: false, message: 'Invalid role' });
     }
 
-    const existingUser = await findUserByUsername(username);
-    if (existingUser) {
+    const [existingUserByUsername, existingUserByEmail] = await Promise.all([
+      findUserByUsername(username),
+      findUserByEmail(email)
+    ]);
+
+    if (existingUserByUsername) {
       return res.status(400).json({ ok: false, message: 'Username already exists' });
+    }
+
+    if (existingUserByEmail) {
+      return res.status(400).json({ ok: false, message: 'Email already exists' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -33,7 +55,8 @@ async function signup(req, res) {
 
 async function login(req, res) {
   try {
-    const { username, password } = req.body;
+    const username = normalizeUsername(req.body.username);
+    const password = String(req.body.password || '');
     if (!username || !password) {
       return res.status(400).json({ ok: false, message: 'Username and password are required' });
     }

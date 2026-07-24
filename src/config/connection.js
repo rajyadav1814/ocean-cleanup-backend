@@ -1,26 +1,36 @@
+import './loadEnv.js';
 import { Pool } from 'pg';
 
-const connectionString = process.env.DATABASE_URL;
+let pool = null;
 
-if (!connectionString) {
-  throw new Error('DATABASE_URL is not set');
+function getConnectionString() {
+  return process.env.DATABASE_URL || null;
 }
 
-const isProduction = process.env.NODE_ENV === 'production';
+function getPool() {
+  const connectionString = getConnectionString();
 
-export const pool = new Pool({
-  connectionString,
-  ssl: isProduction
-    ? { rejectUnauthorized: false }
-    : false
-});
+  if (!connectionString) {
+    throw new Error('DATABASE_URL is not set');
+  }
+
+  if (!pool) {
+    const isProduction = process.env.NODE_ENV === 'production';
+    pool = new Pool({
+      connectionString,
+      ssl: isProduction ? { rejectUnauthorized: false } : false
+    });
+  }
+
+  return pool;
+}
 
 export async function query(text, params = []) {
-  return pool.query(text, params);
+  return getPool().query(text, params);
 }
 
 export async function testConnection() {
-  const client = await pool.connect();
+  const client = await getPool().connect();
   try {
     const result = await client.query('SELECT NOW() AS now');
     return result.rows[0];
@@ -29,4 +39,15 @@ export async function testConnection() {
   }
 }
 
-export default pool;
+export async function closeConnection() {
+  if (pool) {
+    await pool.end();
+    pool = null;
+  }
+}
+
+export default {
+  query,
+  testConnection,
+  closeConnection
+};
