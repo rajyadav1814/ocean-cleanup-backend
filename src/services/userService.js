@@ -40,7 +40,7 @@ export async function saveUsers() {
 export async function findUserByUsername(username) {
   const normalizedUsername = normalizeUsername(username);
   const result = await query(
-    `SELECT id, first_name, last_name, email, username, password_hash, role, created_at
+    `SELECT id, first_name, last_name, email, username, password_hash, role, is_active, created_at
      FROM users
      WHERE LOWER(username) = $1
      LIMIT 1`,
@@ -53,7 +53,7 @@ export async function findUserByUsername(username) {
 export async function findUserByEmail(email) {
   const normalizedEmail = normalizeEmail(email);
   const result = await query(
-    `SELECT id, first_name, last_name, email, username, password_hash, role, created_at
+    `SELECT id, first_name, last_name, email, username, password_hash, role, is_active, created_at
      FROM users
      WHERE LOWER(email) = $1
      LIMIT 1`,
