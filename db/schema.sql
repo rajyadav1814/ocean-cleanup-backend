@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash   TEXT NOT NULL,
     role            user_role NOT NULL,
     is_active       BOOLEAN NOT NULL DEFAULT TRUE,
+    organization_id UUID REFERENCES organizations(org_id),
     created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     CONSTRAINT users_email_unique UNIQUE (email),
     CONSTRAINT users_username_unique UNIQUE (username)
