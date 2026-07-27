@@ -1,5 +1,6 @@
 import { getDashboardStats } from '../services/activityService.js';
 import { getUsers, setUserActiveStatus as setUserActiveStatusInService } from '../services/userService.js';
+import { listOrganizations } from '../services/organizationService.js';
 
 async function getStats(req, res) {
   try {
@@ -20,13 +21,13 @@ async function getUserLists(req, res) {
     const allUsers = await getUsers();
     const verifiers = allUsers
       .filter((u) => u.role === 'verifier')
-      .map(({ id, firstName, lastName, username, email, active, createdAt }) => ({
-        id, firstName, lastName, username, email, active, createdAt
+      .map(({ id, firstName, lastName, username, email, active, organizationId, createdAt }) => ({
+        id, firstName, lastName, username, email, active, organizationId, createdAt
       }));
     const contributors = allUsers
       .filter((u) => u.role === 'contributor')
-      .map(({ id, firstName, lastName, username, email, active, createdAt }) => ({
-        id, firstName, lastName, username, email, active, createdAt
+      .map(({ id, firstName, lastName, username, email, active, organizationId, createdAt }) => ({
+        id, firstName, lastName, username, email, active, organizationId, createdAt
       }));
 
     res.json({ ok: true, verifiers, contributors });
@@ -57,4 +58,15 @@ async function setUserActiveStatus(req, res) {
   }
 }
 
-export default { getStats, getUserLists, setUserActiveStatus };
+async function getPublicOrganizations(req, res) {
+  try {
+    const orgs = await listOrganizations(true); // only active orgs
+    const organizations = orgs.map(({ orgId, name }) => ({ orgId, name }));
+    res.json({ ok: true, organizations });
+  } catch (error) {
+    console.error('Public organizations list error:', error);
+    res.status(500).json({ ok: false, error: 'Failed to fetch organizations' });
+  }
+}
+
+export default { getStats, getUserLists, setUserActiveStatus, getPublicOrganizations };
