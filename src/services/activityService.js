@@ -218,7 +218,9 @@ export async function getDashboardStats() {
        COALESCE(SUM(volunteers), 0)::int AS total_volunteers,
        COUNT(DISTINCT organization_id)::int AS partner_orgs,
        COUNT(*) FILTER (WHERE submitted_at >= NOW() - INTERVAL '30 days')::int AS recent_activities,
-       MAX(submitted_at) AS latest_activity_at
+       MAX(submitted_at) AS latest_activity_at,
+       (SELECT COUNT(*) FROM users WHERE role = 'verifier')::int AS verifier_count,
+       (SELECT COUNT(*) FROM users WHERE role = 'contributor')::int AS contributor_count
      FROM activities`
   );
 
@@ -238,6 +240,8 @@ export async function getDashboardStats() {
   const averageKgPerApprovedActivity = approvedActivities > 0
     ? Number((approvedKgCollected / approvedActivities).toFixed(1))
     : 0;
+  const verifierCount = Number(row.verifier_count) || 0;
+  const contributorCount = Number(row.contributor_count) || 0;
 
   return {
     totalActivities,
@@ -252,6 +256,8 @@ export async function getDashboardStats() {
     approvalRate,
     averageKgPerApprovedActivity,
     recentActivities,
-    latestActivityAt
+    latestActivityAt,
+    verifierCount,
+    contributorCount
   };
 }
