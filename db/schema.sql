@@ -74,5 +74,21 @@ CREATE TABLE IF NOT EXISTS activity_events (
 CREATE INDEX IF NOT EXISTS idx_activity_events_activity_id ON activity_events (activity_id);
 CREATE INDEX IF NOT EXISTS idx_activity_events_created_at ON activity_events (created_at DESC);
 
+CREATE TABLE IF NOT EXISTS organizations (
+    org_id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name            TEXT NOT NULL,
+    region          TEXT,
+    country         TEXT,
+    parent_org_id   UUID REFERENCES organizations(org_id),
+    contact_email   TEXT,
+    joined_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
+    is_active       BOOLEAN NOT NULL DEFAULT true
+);
+
+CREATE INDEX IF NOT EXISTS idx_organizations_is_active  ON organizations (is_active);
+CREATE INDEX IF NOT EXISTS idx_organizations_parent_org ON organizations (parent_org_id);
+CREATE INDEX IF NOT EXISTS idx_organizations_joined_at  ON organizations (joined_at DESC);
+
 COMMIT;
+
 
