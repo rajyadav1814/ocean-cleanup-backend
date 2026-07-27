@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS users (
     username        TEXT NOT NULL,
     password_hash   TEXT NOT NULL,
     role            user_role NOT NULL,
+    is_active       BOOLEAN NOT NULL DEFAULT TRUE,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     CONSTRAINT users_email_unique UNIQUE (email),
     CONSTRAINT users_username_unique UNIQUE (username)
