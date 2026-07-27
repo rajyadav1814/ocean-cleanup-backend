@@ -28,7 +28,7 @@ export async function getUsers() {
   const result = await query(
     `SELECT id, first_name, last_name, email, username, password_hash, role, is_active, created_at
      FROM users
-     ORDER BY created_at ASC`
+     ORDER BY created_at DESC`
   );
   return result.rows.map(mapUserRow);
 }
