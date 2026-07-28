@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { env } from '../config/env.js';
-import { findUserByUsername, findUserByEmail, createUser, findUserById } from '../services/userService.js';
+import { findUserByUsername, findUserByEmail, createUser, findUserById, recordUserLogin, deleteUserLoginRecords } from '../services/userService.js';
 
 function normalizeUsername(value) {
   return String(value || '').trim().toLowerCase();
@@ -77,6 +77,22 @@ async function login(req, res) {
     }
 
     const token = jwt.sign({ id: user.id, role: user.role }, env.jwtSecret, { expiresIn: '24h' });
+
+    const ipAddress = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip || null;
+    const userAgent = req.headers['user-agent'] || null;
+
+    try {
+      await recordUserLogin({
+        userId: user.id,
+        username: user.username,
+        role: user.role,
+        ipAddress,
+        userAgent
+      });
+    } catch (loginError) {
+      console.error('Failed to record user login:', loginError);
+    }
+
     res.json({ ok: true, token, user: { id: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email, username: user.username, role: user.role, organizationId: user.organizationId } });
   } catch (error) {
     console.error('Login error:', error);
@@ -106,4 +122,23 @@ async function verify(req, res) {
   }
 }
 
-export default { signup, login, verify };
+async function logout(req, res) {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ ok: false, message: 'No token provided' });
+    }
+
+    const token = authHeader.split(' ')[1];
+    const decoded = jwt.verify(token, env.jwtSecret);
+
+    await deleteUserLoginRecords(decoded.id);
+
+    res.json({ ok: true, message: 'Logout successful' });
+  } catch (error) {
+    console.error('Logout error:', error);
+    res.status(500).json({ ok: false, message: 'Failed to process logout' });
+  }
+}
+
+export default { signup, login, verify, logout };

@@ -89,6 +89,27 @@ export async function createUser(userData) {
   return mapUserRow(result.rows[0]);
 }
 
+export async function recordUserLogin({ userId, username, role, ipAddress = null, userAgent = null }) {
+  const result = await query(
+    `INSERT INTO user_login (user_id, username, role, ip_address, user_agent)
+     VALUES ($1, $2, $3, $4, $5)
+     RETURNING id, user_id, username, role, ip_address, user_agent, login_at`,
+    [userId, username, role, ipAddress, userAgent]
+  );
+
+  return result.rows[0];
+}
+
+export async function deleteUserLoginRecords(userId) {
+  const result = await query(
+    `DELETE FROM user_login
+     WHERE user_id = $1
+     RETURNING id`,
+    [userId]
+  );
+  return result.rowCount;
+}
+
 export async function findUserById(id) {
   const result = await query(
     `SELECT id, first_name, last_name, email, username, password_hash, role, is_active, organization_id, created_at
