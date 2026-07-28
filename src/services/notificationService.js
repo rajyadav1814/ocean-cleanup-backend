@@ -1,4 +1,5 @@
 import { query } from '../config/connection.js';
+import { findUserById } from './userService.js';
 
 const notificationColumns = `id, recipient_role, recipient_id, activity_id, title, message, link, payload, is_read, created_at`;
 
@@ -30,6 +31,26 @@ export async function createNotification({ recipientRole, recipientId = null, ac
   return mapNotificationRow(result.rows[0]);
 }
 
+async function enrichNotification(notification) {
+  const contributorId = notification.payload?.contributorId;
+  if (!contributorId) return notification;
+
+  const contributor = await findUserById(contributorId);
+  if (!contributor) return notification;
+
+  const contributorName = [contributor.firstName, contributor.lastName].filter(Boolean).join(' ') || contributor.username || contributorId;
+  let message = notification.message;
+  if (message.includes(contributorId)) {
+    message = message.replace(contributorId, contributorName);
+  }
+
+  return {
+    ...notification,
+    message,
+    contributorName
+  };
+}
+
 export async function listNotificationsForRecipient(recipientRole, recipientId = null) {
   const params = [recipientRole];
   let queryText = `SELECT ${notificationColumns}
@@ -44,7 +65,8 @@ export async function listNotificationsForRecipient(recipientRole, recipientId =
   queryText += ` ORDER BY is_read ASC, created_at DESC`;
 
   const result = await query(queryText, params);
-  return result.rows.map(mapNotificationRow);
+  const notifications = result.rows.map(mapNotificationRow);
+  return Promise.all(notifications.map(enrichNotification));
 }
 
 export async function markNotificationReadById(id, recipientRole, recipientId = null) {
@@ -67,9 +89,21 @@ export async function markNotificationReadById(id, recipientRole, recipientId = 
 
 export async function send(activity) {
   const activityLocation = activity.location || 'a cleanup location';
-  const contributor = activity.contributorId ? `by ${activity.contributorId}` : 'by a contributor';
+  let contributorLabel = 'by a contributor';
+
+  if (activity.contributorId) {
+    const contributor = await findUserById(activity.contributorId);
+    if (contributor?.firstName || contributor?.lastName) {
+      contributorLabel = `by ${[contributor.firstName, contributor.lastName].filter(Boolean).join(' ')}`;
+    } else if (contributor?.username) {
+      contributorLabel = `by ${contributor.username}`;
+    } else {
+      contributorLabel = `by ${activity.contributorId}`;
+    }
+  }
+
   const title = 'New activity submitted';
-  const message = `A new cleanup activity was submitted ${contributor} at ${activityLocation}.`;
+  const message = `A new cleanup activity was submitted ${contributorLabel} At: ${activityLocation}.`;
 
   return createNotification({
     recipientRole: 'admin',
