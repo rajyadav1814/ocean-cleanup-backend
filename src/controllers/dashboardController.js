@@ -1,6 +1,7 @@
 import { getDashboardStats } from '../services/activityService.js';
 import { getUsers, setUserActiveStatus as setUserActiveStatusInService } from '../services/userService.js';
 import { listOrganizations } from '../services/organizationService.js';
+import { listNotificationsForRecipient, markNotificationReadById } from '../services/notificationService.js';
 
 async function getStats(req, res) {
   try {
@@ -69,4 +70,30 @@ async function getPublicOrganizations(req, res) {
   }
 }
 
-export default { getStats, getUserLists, setUserActiveStatus, getPublicOrganizations };
+async function getNotifications(req, res) {
+  try {
+    const notifications = await listNotificationsForRecipient('admin', req.user?.id);
+    const unreadCount = notifications.filter((item) => !item.isRead).length;
+
+    res.json({ ok: true, notifications, unreadCount });
+  } catch (error) {
+    console.error('Get notifications error:', error);
+    res.status(500).json({ ok: false, error: 'Failed to load notifications' });
+  }
+}
+
+async function markNotificationRead(req, res) {
+  try {
+    const notification = await markNotificationReadById(req.params.id, 'admin', req.user?.id);
+    if (!notification) {
+      return res.status(404).json({ ok: false, error: 'Notification not found' });
+    }
+
+    res.json({ ok: true, notification });
+  } catch (error) {
+    console.error('Mark notification read error:', error);
+    res.status(500).json({ ok: false, error: 'Failed to update notification' });
+  }
+}
+
+export default { getStats, getUserLists, setUserActiveStatus, getPublicOrganizations, getNotifications, markNotificationRead };

@@ -7,6 +7,7 @@ import {
   mintReward,
   deleteActivity
 } from '../services/activityService.js';
+import { send as sendActivityNotification } from '../services/notificationService.js';
 
 // Helper: convert a base64 data URI → { buffer, mimeType, filename }
 function parseBase64Image(dataUri) {
@@ -94,6 +95,12 @@ async function create(req, res) {
       notes,
       timestamp: req.body.timestamp || new Date().toISOString()
     });
+
+    try {
+      await sendActivityNotification(activity);
+    } catch (notificationError) {
+      console.error('Failed to send admin notification for submitted activity:', notificationError);
+    }
 
     res.status(201).json({ ok: true, activity });
   } catch (error) {
