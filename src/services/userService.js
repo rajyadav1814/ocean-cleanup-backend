@@ -89,14 +89,22 @@ export async function createUser(userData) {
   return mapUserRow(result.rows[0]);
 }
 
-export async function recordUserLogin({ userId, username, role, ipAddress = null, userAgent = null }) {
-  const result = await query(
-    `INSERT INTO user_login (user_id, username, role, ip_address, user_agent)
-     VALUES ($1, $2, $3, $4, $5)
-     RETURNING id, user_id, username, role, ip_address, user_agent, login_at`,
-    [userId, username, role, ipAddress, userAgent]
-  );
+async function ensureUserLoginSocketColumn() {
+  await query(`
+    ALTER TABLE user_login
+    ADD COLUMN IF NOT EXISTS socket_id TEXT;
+  `);
+}
 
+export async function recordUserLogin({ userId, username, role, ipAddress = null, socketId = null }) {
+  await ensureUserLoginSocketColumn();
+
+  const result = await query(
+    `INSERT INTO user_login (user_id, username, role, ip_address, socket_id)
+     VALUES ($1, $2, $3, $4, $5)
+     RETURNING id, user_id, username, role, ip_address, socket_id, login_at`,
+    [userId, username, role, ipAddress, socketId]
+  );
   return result.rows[0];
 }
 

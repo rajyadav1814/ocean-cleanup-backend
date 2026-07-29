@@ -98,6 +98,7 @@ CREATE TABLE IF NOT EXISTS user_login (
     username        TEXT NOT NULL,
     role            user_role NOT NULL,
     ip_address      TEXT,
+    socket_id       TEXT,
     user_agent      TEXT,
     login_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

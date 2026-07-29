@@ -79,7 +79,7 @@ async function login(req, res) {
     const token = jwt.sign({ id: user.id, role: user.role }, env.jwtSecret, { expiresIn: '24h' });
 
     const ipAddress = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip || null;
-    const userAgent = req.headers['user-agent'] || null;
+    const socketId = null;
 
     try {
       await recordUserLogin({
@@ -87,7 +87,7 @@ async function login(req, res) {
         username: user.username,
         role: user.role,
         ipAddress,
-        userAgent
+        socketId
       });
     } catch (loginError) {
       console.error('Failed to record user login:', loginError);
